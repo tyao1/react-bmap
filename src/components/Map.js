@@ -13,7 +13,10 @@ export default class Map extends Component {
   state = {
     loaded: !!window.BMap,
   };
-
+  static defaultProps = {
+    initialZoom: 14,
+    initialCenter: [121.491, 31.233],
+  }
   static propTypes = {
 
   };
@@ -45,6 +48,7 @@ export default class Map extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    if (!this.map) return;
     // onClick event
     if (this.props.onClick !== nextProps.onClick) {
       if (this.props.onClick) {
@@ -75,8 +79,9 @@ export default class Map extends Component {
   }
 
   initBmap = () => {
+    const {initialZoom, initialCenter} = this.props;
     this.map = new BMap.Map('mapHolder');
-    this.map.centerAndZoom(new BMap.Point(121.491, 31.233), 11);
+    this.map.centerAndZoom(new BMap.Point(initialCenter[0], initialCenter[1]), this.props.initialZoom);
     window.daMap = this.map;
     this.setState({ mapLoaded: true }); // force context to be set
     const { onClick } = this.props;
@@ -85,6 +90,9 @@ export default class Map extends Component {
     }
     if (this.props.route && this.props.route.length > 1) {
       this.drawRoute(this.props.route);
+    }
+    if (this.props.onLoad) { // fire onload event
+      this.props.onLoad();
     }
   }
 
